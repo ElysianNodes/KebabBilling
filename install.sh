@@ -86,10 +86,15 @@ setup_app() {
     sudo -u "$APP_USER" "$APP_DIR/venv/bin/pip" install gunicorn -q
     sudo -u "$APP_USER" "$APP_DIR/venv/bin/pip" install -r "$APP_DIR/requirements.txt" -q
 
-    echo "=> Generating SECRET_KEY..."
-    SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
+    echo "=> SECRET_KEY — used for session signing"
+    echo "   Leave empty to auto-generate, or paste your own:"
+    prompt "   SECRET_KEY: " USER_SECRET
+    if [ -z "$USER_SECRET" ]; then
+        echo "   Auto-generating SECRET_KEY..."
+        USER_SECRET=$(python3 -c "import secrets; print(secrets.token_hex(32))")
+    fi
     cat > "$APP_DIR/.env" <<EOF
-SECRET_KEY=$SECRET_KEY
+SECRET_KEY=$USER_SECRET
 FLASK_DEBUG=0
 EOF
     chown "$APP_USER:$APP_USER" "$APP_DIR/.env"
