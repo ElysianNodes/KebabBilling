@@ -66,7 +66,12 @@ create_user() {
 
 setup_app() {
     echo "Setting up KebabBilling..."
+    if [ -d "$APP_DIR" ] && [ ! -d "$APP_DIR/.git" ]; then
+        echo "Cleaning up partial directory from previous run..."
+        rm -rf "$APP_DIR"
+    fi
     mkdir -p "$APP_DIR"
+    git config --global --add safe.directory "$APP_DIR" 2>/dev/null || true
     if [ -d "$APP_DIR/.git" ]; then
         git -C "$APP_DIR" pull
     else
