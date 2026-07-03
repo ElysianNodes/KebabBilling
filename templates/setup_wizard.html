@@ -8,18 +8,8 @@
             <h2>Setup KebabBilling</h2>
             <p>Create your admin account and configure your company</p>
         </div>
-        {% if setup_code %}
-        <div class="alert alert-info small py-2 mb-3">
-            <strong>Setup code printed to console.</strong><br>
-            Check the terminal where the app is running for your one-time code.
-        </div>
-        {% endif %}
         <form method="POST">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
-            <div class="mb-3">
-                <label class="form-label">Setup Code</label>
-                <input type="text" name="code" class="form-control" placeholder="Enter the code from the console" required autocomplete="off">
-            </div>
             <h5 class="mb-3" style="font-weight:600;">Admin Account</h5>
             <div class="mb-3">
                 <label class="form-label">Username</label>

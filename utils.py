@@ -207,9 +207,9 @@ def activate_service(service):
                 plan = json.loads(product.plan_details)
             except json.JSONDecodeError:
                 plan = {}
-        memory = int(plan.get('memory', '').replace('GB', '').strip()) * 1024 if 'GB' in plan.get('memory', '') else int(plan.get('memory', 1024))
-        disk = int(plan.get('disk', '').replace('GB', '').strip()) * 1024 if 'GB' in plan.get('disk', '') else int(plan.get('disk', 10240))
-        cpu = int(plan.get('cpu_cores', 100))
+        memory = int(str(plan.get('memory', '4')).replace('GB', '').strip()) * 1024
+        disk = int(str(plan.get('disk', '20')).replace('GB', '').strip()) * 1024
+        cpu = int(plan.get('cpu_cores', 1)) * 100
         pt_server_id = pterodactyl_create_server(
             name=service.name, user_id=pt_user_id,
             egg_id=product.pterodactyl_egg_id, nest_id=product.pterodactyl_nest_id,

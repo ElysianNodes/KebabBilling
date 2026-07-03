@@ -83,10 +83,6 @@ def setup():
     if is_installed():
         return redirect(url_for('auth.login'))
     if request.method == 'POST':
-        expected = session.get('setup_code')
-        if not expected or request.form.get('code', '').strip() != expected:
-            flash('Invalid setup code. Check the console output.')
-            return render_template('setup_wizard.html', setup_code=expected or session.get('setup_code'))
         from werkzeug.security import generate_password_hash
         admin = User(
             username=request.form['username'],
@@ -108,26 +104,7 @@ def setup():
         session['role'] = 'admin'
         send_discord_webhook(':white_check_mark: **KebabBilling** installed successfully')
         return redirect(url_for('admin.dashboard'))
-    code = session.get('setup_code')
-    if not code:
-        code_file = os.path.join(app.root_path, 'setup_code.txt')
-        code = None
-        if os.path.exists(code_file):
-            try:
-                code = open(code_file).read().strip()
-            except OSError:
-                pass
-        if not code:
-            code = secrets.token_hex(4)
-        session['setup_code'] = code
-    border = '=' * 52
-    print()
-    print(border)
-    print(f'  Setup code: {code}')
-    print(f'  Enter this code in the web setup form to continue.')
-    print(border)
-    print()
-    return render_template('setup_wizard.html', setup_code=code)
+    return render_template('setup_wizard.html')
 
 @app.route('/setup/skip', methods=['POST'])
 def skip_setup():

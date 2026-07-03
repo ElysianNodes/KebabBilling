@@ -77,10 +77,6 @@ setup_app() {
 
     echo "=> Generating SECRET_KEY..."
     SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
-    SETUP_CODE=$(python3 -c "import secrets; print(secrets.token_hex(4))")
-    echo "$SETUP_CODE" > "$APP_DIR/setup_code.txt"
-    chown "$APP_USER:$APP_USER" "$APP_DIR/setup_code.txt"
-    chmod 600 "$APP_DIR/setup_code.txt"
     cat > "$APP_DIR/.env" <<EOF
 SECRET_KEY=$SECRET_KEY
 FLASK_DEBUG=0
@@ -200,7 +196,6 @@ main() {
     echo "====================  KebabBilling installed!  ===================="
     echo "  URL:       http${USE_SSL:+s}://$SERVER_ADDRESS"
     echo "  Setup:     http${USE_SSL:+s}://$SERVER_ADDRESS/setup"
-    echo "  Setup code: $SETUP_CODE"
     echo "  App dir:   $APP_DIR"
     echo "  Service:   systemctl status kebab-billing"
     echo "  Logs:      journalctl -u kebab-billing -f"
