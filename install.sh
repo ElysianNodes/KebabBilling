@@ -5,10 +5,25 @@ APP_DIR="/opt/kebab_billing"
 APP_USER="kebab"
 REPO_URL="https://github.com/ElysianNodes/KebabBilling.git"
 
+# Parse command-line arguments
+SERVER_ADDRESS="${1:-}"
+SSL_CHOICE="${2:-}"
+SSL_EMAIL="${3:-}"
+
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root." >&2
     exit 1
 fi
+
+prompt() {
+    if [ -t 0 ]; then
+        # stdin is a terminal — read normally
+        read -rp "$1" "$2"
+    else
+        # piped stdin — read from /dev/tty
+        read -rp "$1" "$2" </dev/tty
+    fi
+}
 
 detect_os() {
     if [ -f /etc/os-release ]; then
@@ -150,18 +165,24 @@ main() {
     create_user
     setup_app
 
-    read -rp "Enter your domain or IP address: " SERVER_ADDRESS
+    if [ -z "$SERVER_ADDRESS" ]; then
+        prompt "Enter your domain or IP address: " SERVER_ADDRESS
+    fi
 
     USE_SSL=false
     if [[ "$SERVER_ADDRESS" =~ [a-zA-Z] ]]; then
-        read -rp "Use Let's Encrypt SSL? (y/N): " SSL_CHOICE
+        if [ -z "$SSL_CHOICE" ]; then
+            prompt "Use Let's Encrypt SSL? (y/N): " SSL_CHOICE
+        fi
         if [[ "$SSL_CHOICE" =~ ^[Yy]$ ]]; then
             USE_SSL=true
-            while true; do
-                read -rp "Enter your email for Let's Encrypt: " SSL_EMAIL
-                if [[ "$SSL_EMAIL" =~ @ ]]; then break; fi
-                echo "Invalid email."
-            done
+            if [ -z "$SSL_EMAIL" ]; then
+                while true; do
+                    prompt "Enter your email for Let's Encrypt: " SSL_EMAIL
+                    if [[ "$SSL_EMAIL" =~ @ ]]; then break; fi
+                    echo "Invalid email."
+                done
+            fi
         fi
     fi
 
