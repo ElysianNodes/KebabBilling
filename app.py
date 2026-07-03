@@ -112,6 +112,11 @@ def setup():
     if not code:
         code = secrets.token_hex(4)
         session['setup_code'] = code
+    try:
+        with open(os.path.join(app.instance_path, 'setup_code.txt'), 'w') as f:
+            f.write(code)
+    except OSError:
+        pass
     border = '=' * 52
     print()
     print(border)

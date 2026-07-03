@@ -194,8 +194,8 @@ main() {
 
     echo ""
     echo "====================  KebabBilling installed!  ===================="
-    echo "  URL:      http${USE_SSL}s://$SERVER_ADDRESS"
-    echo "  Setup:    http${USE_SSL}s://$SERVER_ADDRESS/setup"
+    echo "  URL:      http${USE_SSL:+s}://$SERVER_ADDRESS"
+    echo "  Setup:    http${USE_SSL:+s}://$SERVER_ADDRESS/setup"
     echo "  App dir:  $APP_DIR"
     echo "  Service:  systemctl status kebab-billing"
     echo "  Logs:     journalctl -u kebab-billing -f"
