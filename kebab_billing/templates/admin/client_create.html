@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Add Client{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Add Client</h1>
+        <p>Create a new customer account</p>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <form method="POST">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Company</label>
+                <input type="text" name="company" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Phone</label>
+                <input type="text" name="phone" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Create Client</button>
+            <a href="{{ url_for('admin.clients') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

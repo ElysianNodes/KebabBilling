@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Ticket #{{ ticket.id }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>{{ ticket.subject }}</h1>
+        <p>Ticket #{{ ticket.id }}</p>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <p><strong>Status:</strong> <span class="badge bg-{{ 'danger' if ticket.status == 'open' else 'success' if ticket.status == 'closed' else 'secondary' }}">{{ ticket.status }}</span></p>
+        <p><strong>Priority:</strong> {{ ticket.priority }}</p>
+        <p><strong>Created:</strong> {{ ticket.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+        <hr>
+        <p>{{ ticket.message }}</p>
+    </div>
+</div>
+
+<h4 class="mt-4 d-flex align-items-center gap-2"><i data-feather="message-circle" style="width:20px;height:20px;"></i> Replies</h4>
+{% for reply in ticket.replies %}
+<div class="card mt-2">
+    <div class="card-body">
+        <p class="text-muted small">
+            {{ reply.author.username }}
+            {% if reply.author.is_admin %}<span class="badge bg-danger">Admin</span>{% endif %}
+            on {{ reply.created_at.strftime('%Y-%m-%d %H:%M') }}
+        </p>
+        <p>{{ reply.message }}</p>
+    </div>
+</div>
+{% else %}
+<p class="text-muted">No replies yet</p>
+{% endfor %}
+
+{% if ticket.status != 'closed' %}
+<div class="card mt-3">
+    <div class="card-body">
+        <form method="POST">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <div class="mb-3">
+                <label class="form-label">Add Reply</label>
+                <textarea name="message" class="form-control" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Reply</button>
+        </form>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

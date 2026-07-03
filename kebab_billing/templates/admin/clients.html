@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Clients{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Clients</h1>
+        <p>Manage your customer accounts</p>
+    </div>
+    {% if session.get('role') == 'admin' %}
+    <a href="{{ url_for('admin.create_client') }}" class="btn btn-primary"><i data-feather="plus" style="width:16px;height:16px;"></i> Add Client</a>
+    {% endif %}
+</div>
+<div class="card">
+    <div class="card-body">
+        <table class="table">
+            <thead><tr><th>Username</th><th>Email</th><th>Company</th><th>Phone</th><th>Joined</th><th></th></tr></thead>
+            <tbody>
+            {% for c in clients %}
+            <tr>
+                <td>{{ c.username }}</td>
+                <td>{{ c.email }}</td>
+                <td>{{ c.company or '-' }}</td>
+                <td>{{ c.phone or '-' }}</td>
+                <td>{{ c.created_at.strftime('%Y-%m-%d') }}</td>
+                <td>
+                    {% if session.get('role') == 'admin' %}
+                    <form method="POST" action="{{ url_for('admin.delete_client', id=c.id) }}" style="display:inline" onsubmit="return confirm('Delete this client?')">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="text-muted">No clients yet</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

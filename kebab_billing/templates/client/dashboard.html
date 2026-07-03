@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Welcome, {{ user.username }}</h1>
+        <p>Here's what's happening with your account</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="stat-card bg-primary-custom">
+            <p>Active Services</p>
+            <h3>{{ active_services }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card bg-warning-custom">
+            <p>Pending Services</p>
+            <h3>{{ pending_services }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card bg-info-custom">
+            <p>Open Tickets</p>
+            <h3>{{ open_tickets }}</h3>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex align-items-center gap-2"><i data-feather="file-text" style="width:16px;height:16px;"></i> Recent Invoices</div>
+            <div class="card-body">
+                {% if recent_invoices %}
+                <table class="table table-sm">
+                    <tr><th>#</th><th>Amount</th><th>Status</th></tr>
+                    {% for inv in recent_invoices %}
+                    <tr>
+                        <td><a href="{{ url_for('client.view_invoice', id=inv.id) }}">{{ inv.number }}</a></td>
+                        <td>${{ "%.2f"|format(inv.amount) }}</td>
+                        <td><span class="invoice-{{ inv.status }}">{{ inv.status }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% else %}<p class="text-muted">No invoices yet</p>{% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex align-items-center gap-2"><i data-feather="message-square" style="width:16px;height:16px;"></i> Recent Tickets</div>
+            <div class="card-body">
+                {% if recent_tickets %}
+                {% for t in recent_tickets %}
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('client.view_ticket', id=t.id) }}">{{ t.subject }}</a>
+                    <span class="badge bg-{{ 'danger' if t.status == 'open' else 'secondary' }} ticket-badge">{{ t.status }}</span>
+                </div>
+                <hr>
+                {% endfor %}
+                {% else %}<p class="text-muted">No tickets yet</p>{% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

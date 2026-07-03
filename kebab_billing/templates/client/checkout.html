@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Checkout{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Checkout</h1>
+        <p>Review your order before confirming</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">Order Summary</div>
+            <div class="card-body">
+                <h4>{{ product.name }}</h4>
+                <p class="text-muted">{{ product.description or '' }}</p>
+                {% if product.plan_details %}
+                {% set details = product.plan_details|from_json %}
+                <ul>
+                    {% for k, v in details.items() %}
+                    <li><strong>{{ k|replace('_', ' ')|title }}:</strong> {{ v }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <span>Setup Fee</span><span>$0.00</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>Monthly Price</span><span><strong>${{ "%.2f"|format(product.price) }}</strong></span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <span><strong>Total Due Today</strong></span>
+                    <span><strong>${{ "%.2f"|format(product.price) }}</strong></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Billing Info</div>
+            <div class="card-body">
+                {% set u = user %}
+                <p class="small">{{ u.address }}<br>{{ u.city }}, {{ u.state }} {{ u.zip_code }}<br>{{ u.country }}</p>
+            </div>
+        </div>
+        <div class="card mt-3">
+            <div class="card-body">
+                <form method="POST">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                    <button type="submit" class="btn btn-success w-100" onclick="return confirm('Place this order? An invoice will be generated.')">
+                        Confirm Order
+                    </button>
+                </form>
+                <a href="{{ url_for('client.order') }}" class="btn btn-outline-secondary w-100 mt-2">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

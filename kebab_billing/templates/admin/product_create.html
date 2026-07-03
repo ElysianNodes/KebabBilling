@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if product else 'Add' }} Product{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>{{ 'Edit' if product else 'Add' }} Product</h1>
+        <p>{{ 'Update' if product else 'Create' }} a service type for customers to order</p>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <form method="POST">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <div class="mb-3">
+                <label class="form-label">Service Name</label>
+                <input type="text" name="name" class="form-control" placeholder="e.g. Garry's Mod Server" value="{{ product.name if product else '' }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-control" rows="3" placeholder="Describe what this service includes">{{ product.description if product else '' }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Price (per month)</label>
+                <input type="number" step="0.01" name="price" class="form-control" value="{{ product.price if product else '' }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Max per user <small class="text-muted">(0 = unlimited)</small></label>
+                <input type="range" name="max_per_user" class="form-range" id="maxPerUser" min="0" max="10" value="{{ product.max_per_user if product and product.max_per_user is not none else 0 }}" oninput="document.getElementById('maxPerUserVal').textContent = this.value == 0 ? 'Unlimited' : this.value">
+                <span id="maxPerUserVal" class="small text-muted">{{ product.max_per_user if product and product.max_per_user else 'Unlimited' }}</span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Product Type</label>
+                <select name="product_type" class="form-select" id="productTypeSelect">
+                    <option value="other" {{ 'selected' if product and product.product_type == 'other' }}>Other</option>
+                    <option value="pterodactyl" {{ 'selected' if product and product.product_type == 'pterodactyl' }}>Pterodactyl Server</option>
+                    <option value="web_hosting" {{ 'selected' if product and product.product_type == 'web_hosting' }}>Web Hosting</option>
+                    <option value="vps" {{ 'selected' if product and product.product_type == 'vps' }}>VPS</option>
+                </select>
+            </div>
+
+            <div id="pterodactylFields" style="display:{{ 'block' if product and product.product_type == 'pterodactyl' else 'none' }}">
+                <hr>
+                <h5>Pterodactyl Configuration</h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Nest ID</label>
+                        <input type="number" name="pterodactyl_nest_id" class="form-control" placeholder="e.g. 1" value="{{ product.pterodactyl_nest_id if product else '' }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Egg ID</label>
+                        <input type="number" name="pterodactyl_egg_id" class="form-control" placeholder="e.g. 3" value="{{ product.pterodactyl_egg_id if product else '' }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Location ID <small class="text-muted">(or use Node)</small></label>
+                        <input type="number" name="pterodactyl_location_id" class="form-control" placeholder="e.g. 1" value="{{ product.pterodactyl_location_id if product else '' }}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Node ID <small class="text-muted">(override Location)</small></label>
+                        <input type="number" name="pterodactyl_node_id" class="form-control" placeholder="e.g. 1" value="{{ product.pterodactyl_node_id if product else '' }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Dedicated IP (0 = auto)</label>
+                        <input type="text" name="pterodactyl_dedicated_ip" class="form-control" value="{{ product.pterodactyl_dedicated_ip if product else '0' }}" placeholder="0">
+                    </div>
+                </div>
+                <p class="text-muted small">If Node ID is provided, it takes priority over Location ID and the server will deploy on that specific node.</p>
+            </div>
+
+            <hr>
+            <h5>Plan Details</h5>
+            <p class="text-muted small">Define the technical specs for this plan (optional).</p>
+            {% set pd = product.plan_details|from_json if product and product.plan_details else {} %}
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">CPU Cores</label>
+                    <input type="text" name="pd_cpu_cores" class="form-control" placeholder="e.g. 4" value="{{ pd.get('cpu_cores', '') }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Memory</label>
+                    <input type="text" name="pd_memory" class="form-control" placeholder="e.g. 8GB" value="{{ pd.get('memory', '') }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Disk Space</label>
+                    <input type="text" name="pd_disk" class="form-control" placeholder="e.g. 50GB" value="{{ pd.get('disk', '') }}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Slots / Players</label>
+                    <input type="text" name="pd_slots" class="form-control" placeholder="e.g. 32" value="{{ pd.get('slots', '') }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Databases</label>
+                    <input type="text" name="pd_databases" class="form-control" placeholder="e.g. 2" value="{{ pd.get('databases', '') }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Backups</label>
+                    <input type="text" name="pd_backups" class="form-control" placeholder="e.g. 3" value="{{ pd.get('backups', '') }}">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">{{ 'Update' if product else 'Create' }} Product</button>
+            <a href="{{ url_for('admin.products') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById('productTypeSelect').addEventListener('change', function() {
+    document.getElementById('pterodactylFields').style.display = this.value === 'pterodactyl' ? 'block' : 'none';
+});
+</script>
+{% endblock %}

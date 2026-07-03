@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Pterodactyl{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Pterodactyl Panel</h1>
+        <p>Manage your game servers and panel access</p>
+    </div>
+</div>
+
+{% if new_password %}
+<div class="alert alert-success">
+    <strong>New panel password:</strong> <code style="font-size:1.1rem;user-select:all;">{{ new_password }}</code>
+    <br><small class="text-muted">Save this password — it will not be shown again after you leave this page.</small>
+</div>
+{% endif %}
+
+{% if not pterodactyl_url %}
+<div class="alert alert-warning d-flex align-items-center gap-2"><i data-feather="alert-triangle" style="width:18px;height:18px;"></i> Pterodactyl panel is not configured yet. Contact the administrator.</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header d-flex align-items-center gap-2"><i data-feather="server" style="width:16px;height:16px;"></i> Your Servers</div>
+    <div class="card-body">
+        {% if services %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Server</th>
+                        <th>Status</th>
+                        <th>Panel</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in services %}
+                    <tr>
+                        <td>{{ s.name }}</td>
+                        <td><span class="badge bg-{% if s.status == 'active' %}success{% elif s.status == 'suspended' %}warning{% else %}secondary{% endif %}">{{ s.status }}</span></td>
+                        <td>
+                            {% if pterodactyl_url and s.pterodactyl_server_id %}
+                            <a href="{{ pterodactyl_url.rstrip('/') }}/server/{{ s.pterodactyl_server_id }}" target="_blank" class="btn btn-sm btn-outline-primary"><i data-feather="external-link" style="width:14px;height:14px;"></i> Open Panel</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">You don't have any Pterodactyl servers yet. <a href="{{ url_for('client.order') }}">Order one now</a>.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header d-flex align-items-center gap-2"><i data-feather="key" style="width:16px;height:16px;"></i> Panel Password</div>
+    <div class="card-body">
+        {% if panel_password %}
+        <p class="text-muted">Your Pterodactyl panel password is shown below.</p>
+        <div class="input-group mb-3" style="max-width:400px;">
+            <input type="password" id="panelPassword" class="form-control" value="{{ panel_password }}" readonly style="font-family:monospace;">
+            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()"><i data-feather="eye" id="pwIcon" style="width:16px;height:16px;"></i></button>
+        </div>
+        {% endif %}
+        <p class="text-muted">Reset your Pterodactyl panel account password. You will see the new password once on screen.</p>
+        <form method="POST" action="{{ url_for('client.pterodactyl_reset_password') }}" onsubmit="return confirm('Reset your Pterodactyl panel password?');">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <button type="submit" class="btn btn-warning"><i data-feather="refresh-cw" style="width:16px;height:16px;"></i> Reset Password</button>
+        </form>
+    </div>
+</div>
+<script>
+function togglePassword() {
+    var inp = document.getElementById('panelPassword');
+    var ico = document.getElementById('pwIcon');
+    if (inp.type === 'password') {
+        inp.type = 'text';
+        ico.setAttribute('data-feather', 'eye-off');
+    } else {
+        inp.type = 'password';
+        ico.setAttribute('data-feather', 'eye');
+    }
+    feather.replace();
+}
+</script>
+{% endblock %}

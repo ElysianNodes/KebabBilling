@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Invoices{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Invoices</h1>
+        <p>Manage all invoices</p>
+    </div>
+    {% if session.get('role') == 'admin' %}
+    <a href="{{ url_for('admin.create_invoice') }}" class="btn btn-primary"><i data-feather="plus" style="width:16px;height:16px;"></i> Create Invoice</a>
+    {% endif %}
+</div>
+<div class="card">
+    <div class="card-body">
+        <table class="table">
+            <thead><tr><th>Invoice #</th><th>Client</th><th>Amount</th><th>Status</th><th>Due</th><th></th></tr></thead>
+            <tbody>
+            {% for inv in invoices %}
+            <tr>
+                <td>{{ inv.number }}</td>
+                <td>{{ inv.client.username }}</td>
+                <td>${{ "%.2f"|format(inv.amount) }}</td>
+                <td><span class="invoice-{{ inv.status }}">{{ inv.status }}</span></td>
+                <td>{{ inv.due_date.strftime('%Y-%m-%d') if inv.due_date else '-' }}</td>
+                <td>
+                    {% if session.get('role') == 'admin' %}
+                    <form method="POST" action="{{ url_for('admin.toggle_invoice', id=inv.id) }}" style="display:inline">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                        <button type="submit" class="btn btn-sm btn-{{ 'success' if inv.status == 'unpaid' else 'secondary' }}">
+                            {{ 'Mark Paid' if inv.status == 'unpaid' else 'Mark Unpaid' }}
+                        </button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="text-muted">No invoices</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

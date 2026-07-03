@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Invoice {{ invoice.number }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Invoice #{{ invoice.number }}</h1>
+        <p>View invoice details</p>
+    </div>
+    <span class="badge bg-{{ 'success' if invoice.status == 'paid' else 'danger' if invoice.status == 'unpaid' else 'secondary' }}" style="font-size:0.9rem;padding:8px 18px;">{{ invoice.status|upper }}</span>
+</div>
+<div class="card">
+    <div class="card-body">
+        <hr>
+        <div class="row">
+            <div class="col-6">
+                <p><strong>Client:</strong> {{ invoice.client.company or invoice.client.username }}</p>
+            </div>
+            <div class="col-6 text-end">
+                <p><strong>Date:</strong> {{ invoice.created_at.strftime('%Y-%m-%d') }}</p>
+                <p><strong>Due:</strong> {{ invoice.due_date.strftime('%Y-%m-%d') if invoice.due_date else 'N/A' }}</p>
+            </div>
+        </div>
+        <p><strong>Description:</strong> {{ invoice.description or 'N/A' }}</p>
+        <h4 class="text-end">Total: ${{ "%.2f"|format(invoice.amount) }}</h4>
+    </div>
+</div>
+{% endblock %}

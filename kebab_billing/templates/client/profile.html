@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>My Profile</h1>
+        <p>Manage your account and billing information</p>
+    </div>
+</div>
+
+{% set billing_req = get_setting('billing_requirement') or 'all' %}
+{% if not user.has_billing_info and billing_req != 'none' %}
+<div class="alert alert-warning d-flex align-items-center gap-2"><i data-feather="alert-triangle" style="width:18px;height:18px;"></i> You must complete your billing information before you can order services.</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header d-flex align-items-center gap-2"><i data-feather="user" style="width:16px;height:16px;"></i> Account Info</div>
+    <div class="card-body">
+        <form method="POST">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input type="text" class="form-control" value="{{ user.username }}" disabled>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Company</label>
+                <input type="text" name="company" class="form-control" value="{{ user.company }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Phone</label>
+                <input type="text" name="phone" class="form-control" value="{{ user.phone }}">
+            </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header d-flex align-items-center gap-2"><i data-feather="map-pin" style="width:16px;height:16px;"></i> Billing Address</div>
+    <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label">Address</label>
+                <textarea name="address" class="form-control" rows="2" required>{{ user.address }}</textarea>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">City</label>
+                    <input type="text" name="city" class="form-control" value="{{ user.city }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">State/Region</label>
+                    <input type="text" name="state" class="form-control" value="{{ user.state }}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">ZIP/Postal Code</label>
+                    <input type="text" name="zip_code" class="form-control" value="{{ user.zip_code }}">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Country</label>
+                    <input type="text" name="country" class="form-control" value="{{ user.country }}" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Profile</button>
+        </form>
+    </div>
+</div>
+
+<div class="card mt-4 border-danger">
+    <div class="card-header d-flex align-items-center gap-2 text-danger"><i data-feather="alert-triangle" style="width:16px;height:16px;"></i> Danger Zone</div>
+    <div class="card-body">
+        <p class="text-muted mb-3">Once you delete your account, there is no going back. All your data will be permanently removed.</p>
+        <form method="POST" action="{{ url_for('client.delete_account') }}" onsubmit="return confirm('Are you sure you want to permanently delete your account? This action cannot be undone.');">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <button type="submit" class="btn btn-outline-danger"><i data-feather="trash-2" style="width:16px;height:16px;"></i> Delete My Account</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

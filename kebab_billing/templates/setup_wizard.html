@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Setup KebabBilling{% endblock %}
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card fade-in-up" style="max-width:520px;">
+        <div class="auth-logo">
+            <div class="logo-icon">B</div>
+            <h2>Setup KebabBilling</h2>
+            <p>Create your admin account and configure your company</p>
+        </div>
+        {% if setup_code %}
+        <div class="alert alert-info small py-2 mb-3">
+            <strong>Setup code printed to console.</strong><br>
+            Check the terminal where the app is running for your one-time code.
+        </div>
+        {% endif %}
+        <form method="POST">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <div class="mb-3">
+                <label class="form-label">Setup Code</label>
+                <input type="text" name="code" class="form-control" placeholder="Enter the code from the console" required autocomplete="off">
+            </div>
+            <h5 class="mb-3" style="font-weight:600;">Admin Account</h5>
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" required>
+            </div>
+            <hr>
+            <h5 class="mb-3" style="font-weight:600;">Company Settings</h5>
+            <div class="mb-3">
+                <label class="form-label">Company Name</label>
+                <input type="text" name="company_name" class="form-control" value="My Company">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Company Email</label>
+                <input type="email" name="company_email" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Company Address</label>
+                <textarea name="company_address" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Currency</label>
+                <select name="currency" class="form-select">
+                    <option value="USD">USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                    <option value="GBP">GBP (£)</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Complete Setup</button>
+        </form>
+        <form method="POST" action="{{ url_for('skip_setup') }}" class="mt-2">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <button type="submit" class="btn btn-link w-100 text-muted" style="text-decoration:none;">Skip Setup</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

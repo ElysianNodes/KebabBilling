@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Updates{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Updates</h1>
+        <p>Check for new versions of KebabBilling</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex align-items-center gap-2"><i data-feather="info" style="width:16px;height:16px;"></i> Current Version</div>
+            <div class="card-body text-center py-4">
+                <h2 style="font-size:2.5rem;font-weight:800;color:var(--accent);">v{{ current_version }}</h2>
+                <p class="text-muted">Your installed version</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex align-items-center gap-2"><i data-feather="cloud" style="width:16px;height:16px;"></i> Latest Version</div>
+            <div class="card-body text-center py-4">
+                {% if error %}
+                <h2 style="font-size:2.5rem;font-weight:800;color:#a0aec0;">--</h2>
+                <p class="text-danger small">Could not check: {{ error }}</p>
+                {% elif remote_version %}
+                <h2 style="font-size:2.5rem;font-weight:800;color:{{ '#48bb78' if update_available else '#a0aec0' }};">v{{ remote_version }}</h2>
+                <p class="text-muted">
+                    {% if update_available %}
+                    <span class="badge bg-success" style="font-size:0.85rem;">Update Available</span>
+                    {% else %}
+                    You're on the latest version
+                    {% endif %}
+                </p>
+                {% else %}
+                <h2 style="font-size:2.5rem;font-weight:800;color:#a0aec0;">--</h2>
+                <p class="text-muted">Could not fetch latest version</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if changelog %}
+<div class="card mt-4">
+    <div class="card-header d-flex align-items-center gap-2"><i data-feather="file-text" style="width:16px;height:16px;"></i> Changelog{% if remote_version %} (v{{ remote_version }}){% endif %}</div>
+    <div class="card-body">
+        <ul style="list-style:none;padding:0;margin:0;">
+            {% for item in changelog %}
+            <li style="padding:8px 12px;border-bottom:1px solid rgba(0,0,0,0.04);display:flex;align-items:center;gap:10px;">
+                <span style="width:6px;height:6px;background:var(--accent);border-radius:50%;display:inline-block;"></span>
+                {{ item }}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}
+
+<div class="card mt-4">
+    <div class="card-body text-center">
+        <p class="text-muted mb-0">
+            <i data-feather="refresh-cw" style="width:14px;height:14px;"></i>
+            Page checks for updates automatically when you visit.
+        </p>
+    </div>
+</div>
+{% endblock %}

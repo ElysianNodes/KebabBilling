@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Dashboard</h1>
+        <p>Overview of your billing system</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-3">
+        <div class="stat-card bg-primary-custom">
+            <p>Clients</p>
+            <h3>{{ total_clients }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card bg-success-custom">
+            <p>Active Services</p>
+            <h3>{{ active_services }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card bg-warning-custom">
+            <p>Pending Services</p>
+            <h3>{{ pending_services }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card bg-info-custom">
+            <p>Unpaid Invoices</p>
+            <h3>{{ unpaid_invoices }}</h3>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Overview</div>
+            <div class="card-body">
+                <p>Total Tickets: <strong>{{ total_tickets }}</strong> ({{ open_tickets }} open)</p>
+                <p>Total Invoices: <strong>{{ total_invoices }}</strong></p>
+                <p>Total Services: <strong>{{ total_services }}</strong></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Recent Tickets</div>
+            <div class="card-body">
+                {% for t in recent_tickets %}
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('admin.view_ticket', id=t.id) }}">{{ t.subject }}</a>
+                    <span class="badge bg-{{ 'danger' if t.status == 'open' else 'secondary' }}">{{ t.status }}</span>
+                </div>
+                <hr>
+                {% else %}
+                <p class="text-muted">No tickets</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

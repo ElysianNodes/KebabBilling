@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Staff Management{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Staff Management</h1>
+        <p>Manage support agents</p>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex align-items-center gap-2"><i data-feather="user-plus" style="width:16px;height:16px;"></i> Add / Remove Support Agent</div>
+    <div class="card-body">
+        <form method="POST" class="row g-2">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <div class="col-auto flex-grow-1">
+                <input type="email" name="email" class="form-control" placeholder="Enter user email" required>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Toggle Role</button>
+            </div>
+        </form>
+        <div class="form-text">Enter an email to toggle the user between client and support agent. Supports are automatically demoted if promoted again.</div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header d-flex align-items-center gap-2"><i data-feather="shield" style="width:16px;height:16px;"></i> Current Support Agents</div>
+    <div class="card-body">
+        {% if staff %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Joined</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in staff %}
+                    <tr>
+                        <td>{{ s.username }}</td>
+                        <td>{{ s.email }}</td>
+                        <td>{{ s.created_at.strftime('%Y-%m-%d') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No support agents yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

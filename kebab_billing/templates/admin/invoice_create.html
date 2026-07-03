@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Create Invoice{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Create Invoice</h1>
+        <p>Generate a new invoice for a client</p>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <form method="POST">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <div class="mb-3">
+                <label class="form-label">Client</label>
+                <select name="user_id" class="form-select" required>
+                    {% for c in clients %}
+                    <option value="{{ c.id }}">{{ c.username }} ({{ c.email }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Invoice Number</label>
+                <input type="text" name="number" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Amount</label>
+                <input type="number" step="0.01" name="amount" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Due Date</label>
+                <input type="date" name="due_date" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select">
+                    <option value="unpaid">Unpaid</option>
+                    <option value="paid">Paid</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Create</button>
+            <a href="{{ url_for('admin.invoices') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

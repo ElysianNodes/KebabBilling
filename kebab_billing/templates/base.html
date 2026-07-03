@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}KebabBilling{% endblock %} - {{ get_setting('company_name') or 'KebabBilling' }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body>
+<div class="layout-wrapper">
+    {% set company_name = get_setting('company_name') or 'KebabBilling' %}
+    {% set logo_path = get_setting('logo_path') %}
+    {% if 'user_id' in session %}
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            {% if logo_path %}
+            <img src="{{ url_for('static', filename='uploads/' + logo_path) }}" alt="Logo" class="logo-icon" style="max-width:38px;max-height:38px;border-radius:6px;">
+            {% else %}
+            <div class="logo-fallback">B</div>
+            {% endif %}
+            <span>{{ company_name }}</span>
+        </div>
+        <div class="sidebar-nav">
+            {% if session.get('role') == 'admin' %}
+            <div class="nav-section">Admin</div>
+            <a href="{{ url_for('admin.dashboard') }}" class="{% if request.path == '/admin' %}active{% endif %}">
+                <i data-feather="grid"></i> Dashboard
+            </a>
+            <a href="{{ url_for('admin.clients') }}" class="{% if '/admin/clients' in request.path %}active{% endif %}">
+                <i data-feather="users"></i> Clients
+            </a>
+            <a href="{{ url_for('admin.tickets') }}" class="{% if '/admin/tickets' in request.path %}active{% endif %}">
+                <i data-feather="message-square"></i> Tickets
+            </a>
+            <a href="{{ url_for('admin.invoices') }}" class="{% if '/admin/invoices' in request.path %}active{% endif %}">
+                <i data-feather="file-text"></i> Invoices
+            </a>
+            <a href="{{ url_for('admin.services') }}" class="{% if '/admin/services' in request.path %}active{% endif %}">
+                <i data-feather="server"></i> Services
+            </a>
+            <a href="{{ url_for('admin.products') }}" class="{% if '/admin/products' in request.path %}active{% endif %}">
+                <i data-feather="package"></i> Products
+            </a>
+            <div class="nav-section">System</div>
+            <a href="{{ url_for('admin.updates') }}" class="{% if '/admin/updates' in request.path %}active{% endif %}">
+                <i data-feather="refresh-cw"></i> Updates
+            </a>
+            <a href="{{ url_for('admin.settings') }}" class="{% if '/admin/settings' in request.path %}active{% endif %}">
+                <i data-feather="settings"></i> Settings
+            </a>
+            <a href="{{ url_for('admin.staff') }}" class="{% if '/admin/staff' in request.path %}active{% endif %}">
+                <i data-feather="shield"></i> Staff
+            </a>
+            {% elif session.get('role') == 'support' %}
+            <div class="nav-section">Support</div>
+            <a href="{{ url_for('admin.dashboard') }}" class="{% if request.path == '/admin' %}active{% endif %}">
+                <i data-feather="grid"></i> Dashboard
+            </a>
+            <a href="{{ url_for('admin.clients') }}" class="{% if '/admin/clients' in request.path %}active{% endif %}">
+                <i data-feather="users"></i> Clients
+            </a>
+            <a href="{{ url_for('admin.tickets') }}" class="{% if '/admin/tickets' in request.path %}active{% endif %}">
+                <i data-feather="message-square"></i> Tickets
+            </a>
+            <a href="{{ url_for('admin.invoices') }}" class="{% if '/admin/invoices' in request.path %}active{% endif %}">
+                <i data-feather="file-text"></i> Invoices
+            </a>
+            <a href="{{ url_for('admin.services') }}" class="{% if '/admin/services' in request.path %}active{% endif %}">
+                <i data-feather="server"></i> Services
+            </a>
+            {% else %}
+            <div class="nav-section">Client Area</div>
+            <a href="{{ url_for('client.dashboard') }}" class="{% if request.path == '/' %}active{% endif %}">
+                <i data-feather="grid"></i> Dashboard
+            </a>
+            <a href="{{ url_for('client.order') }}" class="{% if '/order' in request.path %}active{% endif %}">
+                <i data-feather="shopping-cart"></i> Order
+            </a>
+            <a href="{{ url_for('client.services') }}" class="{% if '/services' in request.path %}active{% endif %}">
+                <i data-feather="server"></i> Services
+            </a>
+            <a href="{{ url_for('client.tickets') }}" class="{% if '/tickets' in request.path %}active{% endif %}">
+                <i data-feather="message-square"></i> Tickets
+            </a>
+            <a href="{{ url_for('client.invoices') }}" class="{% if '/invoices' in request.path %}active{% endif %}">
+                <i data-feather="file-text"></i> Invoices
+            </a>
+            <a href="{{ url_for('client.pterodactyl') }}" class="{% if '/pterodactyl' in request.path %}active{% endif %}">
+                <i data-feather="terminal"></i> Pterodactyl
+            </a>
+            <a href="{{ url_for('client.profile') }}" class="{% if '/profile' in request.path %}active{% endif %}">
+                <i data-feather="user"></i> Profile
+            </a>
+            {% endif %}
+        </div>
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}"><i data-feather="log-out"></i> Logout</a>
+            <a href="https://discord.gg/d3FXFKqyN4" target="_blank" class="watermark" style="text-decoration:none;">Powered by KebabBilling</a>
+        </div>
+    </nav>
+    <main class="main-content">
+    {% else %}
+    <main class="main-content" style="margin-left:0;width:100%;padding:0;">
+    {% endif %}
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-info alert-dismissible fade show">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>feather.replace();</script>
+</body>
+</html>

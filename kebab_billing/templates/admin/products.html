@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Products{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Products</h1>
+        <p>Service types available for order</p>
+    </div>
+    <a href="{{ url_for('admin.create_product') }}" class="btn btn-primary"><i data-feather="plus" style="width:16px;height:16px;"></i> Add Product</a>
+</div>
+<div class="card">
+    <div class="card-body">
+        <table class="table">
+            <thead><tr><th>Name</th><th>Type</th><th>Price</th><th>Active</th><th>Created</th><th></th></tr></thead>
+            <tbody>
+            {% for p in products %}
+            <tr>
+                <td>{{ p.name }}</td>
+                <td><span class="badge bg-info">{{ p.product_type }}</span></td>
+                <td>${{ "%.2f"|format(p.price) }}/mo</td>
+                <td><span class="badge bg-{{ 'success' if p.is_active else 'secondary' }}">{{ 'Active' if p.is_active else 'Disabled' }}</span></td>
+                <td>{{ p.created_at.strftime('%Y-%m-%d') }}</td>
+                <td>
+                    <a href="{{ url_for('admin.edit_product', id=p.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                    <form method="POST" action="{{ url_for('admin.toggle_product', id=p.id) }}" style="display:inline">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                        <button type="submit" class="btn btn-sm btn-{{ 'warning' if p.is_active else 'success' }}">
+                            {{ 'Disable' if p.is_active else 'Enable' }}
+                        </button>
+                    </form>
+                    <form method="POST" action="{{ url_for('admin.delete_product', id=p.id) }}" style="display:inline" onsubmit="return confirm('Delete this product?')">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="text-muted">No products yet</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Services{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Services</h1>
+        <p>Manage all client services</p>
+    </div>
+    {% if session.get('role') == 'admin' %}
+    <a href="{{ url_for('admin.create_service') }}" class="btn btn-primary"><i data-feather="plus" style="width:16px;height:16px;"></i> Add Service</a>
+    {% endif %}
+</div>
+<div class="card">
+    <div class="card-body">
+        <table class="table">
+            <thead><tr><th>Name</th><th>Client</th><th>Price</th><th>Status</th><th>Next Due</th><th>Pterodactyl</th><th></th></tr></thead>
+            <tbody>
+            {% for s in services %}
+            <tr>
+                <td>{{ s.name }}</td>
+                <td>{{ s.client.username }}</td>
+                <td>${{ "%.2f"|format(s.price) }}/mo</td>
+                <td>
+                    <span class="badge bg-{{ 'success' if s.status == 'active' else 'warning' if s.status == 'pending' else 'secondary' }}">
+                        {{ s.status }}
+                    </span>
+                </td>
+                <td>{{ s.next_due_date.strftime('%Y-%m-%d') if s.next_due_date else '-' }}</td>
+                <td class="small">
+                    {% if s.pterodactyl_server_id %}
+                    U:{{ s.pterodactyl_user_id }} S:{{ s.pterodactyl_server_id }}
+                    {% else %}--{% endif %}
+                </td>
+                <td>
+                    {% if session.get('role') == 'admin' %}
+                    {% if s.status == 'pending' %}
+                    <form method="POST" action="{{ url_for('admin.approve_service', id=s.id) }}" style="display:inline" onsubmit="return confirm('Approve & activate this service?')">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                        <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                    </form>
+                    {% elif s.status in ('active', 'suspended') %}
+                    <form method="POST" action="{{ url_for('admin.toggle_service', id=s.id) }}" style="display:inline">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                        <button type="submit" class="btn btn-sm btn-{{ 'warning' if s.status == 'active' else 'success' }}">
+                            {{ 'Suspend' if s.status == 'active' else 'Activate' }}
+                        </button>
+                    </form>
+                    {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7" class="text-muted">No services</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
