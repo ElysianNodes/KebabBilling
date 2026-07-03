@@ -1,14 +1,22 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
 
 APP_DIR="/opt/kebab_billing"
 APP_USER="kebab"
 REPO_URL="https://github.com/ElysianNodes/KebabBilling.git"
 
-# Parse command-line arguments
+# Parse CLI args (domain, ssl_y/n, ssl_email)
 SERVER_ADDRESS="${1:-}"
 SSL_CHOICE="${2:-}"
 SSL_EMAIL="${3:-}"
+
+# If stdin is a pipe (curl | bash), reconnect to terminal for interactive prompts
+if [ ! -t 0 ] && [ -e /dev/tty ]; then
+    exec </dev/tty
+fi
+if [ ! -t 1 ] && [ -e /dev/tty ]; then
+    exec >/dev/tty 2>&1
+fi
 
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root." >&2
@@ -16,20 +24,13 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 prompt() {
-    if [ -t 0 ]; then
-        # stdin is a terminal — read normally
-        read -rp "$1" "$2"
-    else
-        # piped stdin — read from /dev/tty
-        read -rp "$1" "$2" </dev/tty
-    fi
+    read -rp "$1" "$2"
 }
 
 detect_os() {
     if [ -f /etc/os-release ]; then
         . /etc/os-release
         OS="$ID"
-        OS_VERSION="$VERSION_ID"
     else
         echo "Unsupported OS." >&2
         exit 1
@@ -37,7 +38,7 @@ detect_os() {
 }
 
 install_packages() {
-    echo "Installing system packages..."
+    echo "=> Installing system packages..."
     case "$OS" in
         ubuntu|debian)
             apt-get update -qq
@@ -65,27 +66,27 @@ create_user() {
 }
 
 setup_app() {
-    echo "Setting up KebabBilling..."
+    echo "=> Setting up KebabBilling..."
     if [ -d "$APP_DIR" ] && [ ! -d "$APP_DIR/.git" ]; then
-        echo "Cleaning up partial directory from previous run..."
+        echo "   Cleaning up partial directory from previous run..."
         rm -rf "$APP_DIR"
     fi
     mkdir -p "$APP_DIR"
     git config --global --add safe.directory "$APP_DIR" 2>/dev/null || true
     if [ -d "$APP_DIR/.git" ]; then
-        git -C "$APP_DIR" pull
+        git -C "$APP_DIR" pull --ff-only
     else
         git clone "$REPO_URL" "$APP_DIR"
     fi
     chown -R "$APP_USER:$APP_USER" "$APP_DIR"
 
-    echo "Creating Python virtual environment..."
+    echo "=> Creating Python virtual environment..."
     sudo -u "$APP_USER" python3 -m venv "$APP_DIR/venv"
-    sudo -u "$APP_USER" "$APP_DIR/venv/bin/pip" install --upgrade pip
-    sudo -u "$APP_USER" "$APP_DIR/venv/bin/pip" install gunicorn
-    sudo -u "$APP_USER" "$APP_DIR/venv/bin/pip" install -r "$APP_DIR/requirements.txt"
+    sudo -u "$APP_USER" "$APP_DIR/venv/bin/pip" install --upgrade pip -q
+    sudo -u "$APP_USER" "$APP_DIR/venv/bin/pip" install gunicorn -q
+    sudo -u "$APP_USER" "$APP_DIR/venv/bin/pip" install -r "$APP_DIR/requirements.txt" -q
 
-    echo "Generating SECRET_KEY..."
+    echo "=> Generating SECRET_KEY..."
     SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
     cat > "$APP_DIR/.env" <<EOF
 SECRET_KEY=$SECRET_KEY
@@ -96,7 +97,7 @@ EOF
 }
 
 setup_systemd() {
-    echo "Creating systemd service..."
+    echo "=> Creating systemd service..."
     cat > /etc/systemd/system/kebab-billing.service <<EOF
 [Unit]
 Description=KebabBilling
@@ -117,12 +118,12 @@ EOF
     systemctl daemon-reload
     systemctl enable kebab-billing
     systemctl start kebab-billing
-    echo "KebabBilling service started."
+    echo "   KebabBilling service started."
 }
 
 setup_nginx() {
     local domain="$1"
-    echo "Configuring nginx for $domain..."
+    echo "=> Configuring nginx for $domain..."
     cat > /etc/nginx/sites-available/kebab-billing <<EOF
 server {
     listen 80;
@@ -147,9 +148,9 @@ EOF
 setup_ssl() {
     local domain="$1"
     local email="$2"
-    echo "Obtaining Let's Encrypt certificate for $domain..."
+    echo "=> Obtaining Let's Encrypt certificate for $domain..."
     certbot --nginx -d "$domain" --non-interactive --agree-tos -m "$email" --redirect
-    echo "SSL configured."
+    echo "   SSL configured."
 }
 
 configure_firewall() {
