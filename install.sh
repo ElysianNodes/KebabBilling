@@ -5,27 +5,16 @@ APP_DIR="/opt/kebab_billing"
 APP_USER="kebab"
 REPO_URL="https://github.com/ElysianNodes/KebabBilling.git"
 
-# Parse CLI args (domain, ssl_y/n, ssl_email)
-SERVER_ADDRESS="${1:-}"
-SSL_CHOICE="${2:-}"
-SSL_EMAIL="${3:-}"
-
-# If stdin is a pipe (curl | bash), reconnect to terminal for interactive prompts
-if [ ! -t 0 ] && [ -e /dev/tty ]; then
-    exec </dev/tty
-fi
-if [ ! -t 1 ] && [ -e /dev/tty ]; then
-    exec >/dev/tty 2>&1
-fi
+# Usage: bash install.sh [domain] [ssl=y/n] [ssl_email]
+# Or set env vars: SERVER_ADDRESS, SSL_CHOICE, SSL_EMAIL
+SERVER_ADDRESS="${1:-${SERVER_ADDRESS:-}}"
+SSL_CHOICE="${2:-${SSL_CHOICE:-}}"
+SSL_EMAIL="${3:-${SSL_EMAIL:-}}"
 
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root." >&2
     exit 1
 fi
-
-prompt() {
-    read -rp "$1" "$2"
-}
 
 detect_os() {
     if [ -f /etc/os-release ]; then
@@ -86,15 +75,10 @@ setup_app() {
     sudo -u "$APP_USER" "$APP_DIR/venv/bin/pip" install gunicorn -q
     sudo -u "$APP_USER" "$APP_DIR/venv/bin/pip" install -r "$APP_DIR/requirements.txt" -q
 
-    echo "=> SECRET_KEY — used for session signing"
-    echo "   Leave empty to auto-generate, or paste your own:"
-    prompt "   SECRET_KEY: " USER_SECRET
-    if [ -z "$USER_SECRET" ]; then
-        echo "   Auto-generating SECRET_KEY..."
-        USER_SECRET=$(python3 -c "import secrets; print(secrets.token_hex(32))")
-    fi
+    echo "=> Generating SECRET_KEY..."
+    SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
     cat > "$APP_DIR/.env" <<EOF
-SECRET_KEY=$USER_SECRET
+SECRET_KEY=$SECRET_KEY
 FLASK_DEBUG=0
 EOF
     chown "$APP_USER:$APP_USER" "$APP_DIR/.env"
@@ -177,22 +161,24 @@ main() {
     setup_app
 
     if [ -z "$SERVER_ADDRESS" ]; then
-        prompt "Enter your domain or IP address: " SERVER_ADDRESS
+        echo "Usage: bash install.sh <domain|ip> [y/n] [ssl_email]"
+        echo ""
+        echo "  curl -L https://raw.githubusercontent.com/ElysianNodes/KebabBilling/main/install.sh | bash /dev/stdin mydomain.com y admin@mydomain.com"
+        echo ""
+        echo "  Or download first:"
+        echo "  curl -L -o install.sh https://raw.githubusercontent.com/ElysianNodes/KebabBilling/main/install.sh"
+        echo "  bash install.sh mydomain.com y admin@mydomain.com"
+        echo ""
+        exit 1
     fi
 
     USE_SSL=false
     if [[ "$SERVER_ADDRESS" =~ [a-zA-Z] ]]; then
-        if [ -z "$SSL_CHOICE" ]; then
-            prompt "Use Let's Encrypt SSL? (y/N): " SSL_CHOICE
-        fi
         if [[ "$SSL_CHOICE" =~ ^[Yy]$ ]]; then
             USE_SSL=true
-            if [ -z "$SSL_EMAIL" ]; then
-                while true; do
-                    prompt "Enter your email for Let's Encrypt: " SSL_EMAIL
-                    if [[ "$SSL_EMAIL" =~ @ ]]; then break; fi
-                    echo "Invalid email."
-                done
+            if [ -z "$SSL_EMAIL" ] || [[ ! "$SSL_EMAIL" =~ @ ]]; then
+                echo "Error: valid --email required for Let's Encrypt SSL." >&2
+                exit 1
             fi
         fi
     fi
