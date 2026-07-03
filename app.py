@@ -110,13 +110,16 @@ def setup():
         return redirect(url_for('admin.dashboard'))
     code = session.get('setup_code')
     if not code:
-        code = secrets.token_hex(4)
+        code_file = os.path.join(app.root_path, 'setup_code.txt')
+        code = None
+        if os.path.exists(code_file):
+            try:
+                code = open(code_file).read().strip()
+            except OSError:
+                pass
+        if not code:
+            code = secrets.token_hex(4)
         session['setup_code'] = code
-    try:
-        with open(os.path.join(app.instance_path, 'setup_code.txt'), 'w') as f:
-            f.write(code)
-    except OSError:
-        pass
     border = '=' * 52
     print()
     print(border)
