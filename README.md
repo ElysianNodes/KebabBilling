@@ -75,7 +75,9 @@ systemctl reload nginx              # reload nginx
 # SSL renewal (auto via certbot)
 certbot renew
 ```
-
+### Known Issues
+- Staff system doesn't work
+- Discord webhooks doesn't work
 ---
 
 ## Features
