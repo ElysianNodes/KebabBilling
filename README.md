@@ -1,6 +1,6 @@
 # KebabBilling
 
-A lightweight billing and management panel with Pterodactyl game panel integration. Built with Flask.
+A lightweight billing and management panel with Pterodactyl game panel integration.
 
 ---
 
