@@ -1,8 +1,9 @@
 import os
-from flask import Blueprint, current_app, render_template, request, redirect, url_for, flash, session
+import shutil
+from datetime import datetime
+from flask import Blueprint, current_app, render_template, request, redirect, url_for, flash, session, send_file
 from werkzeug.utils import secure_filename
 from models import db, User, Ticket, TicketReply, Invoice, Service, Product, Setting
-from datetime import datetime
 from utils import send_discord_webhook, get_setting, activate_service
 import json
 
@@ -372,3 +373,16 @@ def updates():
                          changelog=changelog,
                          update_available=update_available,
                          error=error)
+
+@admin_bp.route('/admin/backup')
+@admin_required
+def backup():
+    if request.args.get('download'):
+        db_path = db.engine.url.database
+        backup_dir = os.path.join(os.path.dirname(db_path), 'backups')
+        os.makedirs(backup_dir, exist_ok=True)
+        ts = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
+        backup_path = os.path.join(backup_dir, f'kebab_billing_{ts}.db')
+        shutil.copy2(db_path, backup_path)
+        return send_file(backup_path, as_attachment=True, download_name=f'kebab_billing_{ts}.db')
+    return render_template('admin/backup.html')

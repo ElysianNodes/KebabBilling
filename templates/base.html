@@ -45,6 +45,9 @@
                 <i data-feather="package"></i> Products
             </a>
             <div class="nav-section">System</div>
+            <a href="{{ url_for('admin.backup') }}" class="{% if '/admin/backup' in request.path %}active{% endif %}">
+                <i data-feather="download-cloud"></i> Backup
+            </a>
             <a href="{{ url_for('admin.updates') }}" class="{% if '/admin/updates' in request.path %}active{% endif %}">
                 <i data-feather="refresh-cw"></i> Updates
             </a>

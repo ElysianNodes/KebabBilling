@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Database Backup{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Database Backup</h1>
+        <p>Download a copy of your database for safekeeping</p>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i data-feather="database" style="width:48px;height:48px;color:var(--text-muted);margin-bottom:16px;"></i>
+        <h5>Download Backup</h5>
+        <p class="text-muted mb-4">Downloads a snapshot of the current database. You can restore it later by replacing the database file while the service is stopped.</p>
+        <a href="{{ url_for('admin.backup', download=1) }}" class="btn btn-primary"><i data-feather="download" style="width:16px;height:16px;"></i> Download Backup</a>
+    </div>
+</div>
+{% endblock %}
