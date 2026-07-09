@@ -30,6 +30,15 @@ After install, visit `/setup` to create your admin account.
 
 ---
 
+## Quick Update
+
+One-liner to pull latest code, update dependencies, and restart:
+```bash
+curl -L https://raw.githubusercontent.com/ElysianNodes/KebabBilling/main/update.sh | bash
+```
+
+---
+
 ## Manual Install
 
 ### Requirements
