@@ -60,13 +60,17 @@ Then open `http://localhost:5000/setup`.
 ```bash
 # Service
 systemctl status kebab-billing     # check status
-systemctl restart kebab-billing     # restart after updates
+systemctl restart kebab-billing     # restart
 journalctl -u kebab-billing -f      # live logs
 
-# Update
+# Update (preserves all data)
 cd /opt/kebab_billing
 sudo -u kebab git pull
+sudo -u kebab venv/bin/pip install -r requirements.txt -q
 systemctl restart kebab-billing
+
+# Or use the update script:
+bash /opt/kebab_billing/update.sh
 
 # Nginx
 nginx -t                            # test config
