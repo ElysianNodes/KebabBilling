@@ -1,3 +1,78 @@
+[data-theme="dark"] {
+    --sidebar-bg: #0f0f1a;
+    --sidebar-hover: #1a1a2e;
+    --sidebar-active-bg: rgba(105,86,235,0.18);
+    --card-bg: #1a1a2e;
+    --body-bg: #0d0d1a;
+    --text-muted: #8b8fa3;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+    --shadow-lg: 0 10px 40px rgba(0,0,0,0.5);
+}
+
+[data-theme="dark"] body {
+    color: #c8c9d6;
+}
+
+[data-theme="dark"] .page-header h1 {
+    color: #e8e9f0;
+}
+
+[data-theme="dark"] .sidebar-logo span {
+    color: #e8e9f0;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    background: #16162a;
+    border-color: #2d2d4a;
+    color: #c8c9d6;
+}
+
+[data-theme="dark"] .form-label {
+    color: #a8a9c0;
+}
+
+[data-theme="dark"] .table thead th {
+    color: #8b8fa3;
+}
+
+[data-theme="dark"] .table tbody td {
+    border-bottom-color: rgba(255,255,255,0.04);
+}
+
+[data-theme="dark"] .table tbody tr:hover {
+    background: rgba(105,86,235,0.06);
+}
+
+[data-theme="dark"] .card-header {
+    border-bottom-color: rgba(255,255,255,0.06);
+}
+
+[data-theme="dark"] .auth-wrapper {
+    background: #0d0d1a;
+}
+
+[data-theme="dark"] .auth-card {
+    background: #1a1a2e;
+}
+
+[data-theme="dark"] .auth-card .auth-logo h2 {
+    color: #e8e9f0;
+}
+
+[data-theme="dark"] .auth-card .form-control {
+    background: #16162a;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.15);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.25);
+}
+
 :root {
     --sidebar-width: 260px;
     --sidebar-bg: #1e1e2d;
@@ -161,6 +236,36 @@ body {
     text-align: center;
     padding: 12px 0 4px;
     letter-spacing: 0.3px;
+}
+
+.sidebar-footer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.theme-toggle {
+    background: none;
+    border: none;
+    color: #9899ac;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.theme-toggle:hover {
+    color: #fff;
+    background: var(--sidebar-hover);
+}
+
+.theme-toggle svg {
+    width: 16px;
+    height: 16px;
 }
 
 .main-content {
