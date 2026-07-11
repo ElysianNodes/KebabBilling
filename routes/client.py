@@ -63,9 +63,13 @@ def tickets():
 @login_required
 @rate_limit(3, 600)
 def new_ticket():
+    user = User.query.get(session['user_id'])
+    services = Service.query.filter_by(user_id=user.id).all()
     if request.method == 'POST':
+        service_id = request.form.get('service_id')
         ticket = Ticket(
             user_id=session['user_id'],
+            service_id=int(service_id) if service_id else None,
             subject=request.form['subject'],
             message=request.form['message'],
             priority=request.form.get('priority', 'normal')
@@ -75,7 +79,7 @@ def new_ticket():
         flash('Ticket created')
         send_discord_webhook(f':inbox_tray: **New ticket** #{ticket.id} "{ticket.subject}" by {ticket.client.username}')
         return redirect(url_for('client.tickets'))
-    return render_template('client/ticket_new.html')
+    return render_template('client/ticket_new.html', services=services)
 
 @client_bp.route('/tickets/<int:id>', methods=['GET', 'POST'])
 @login_required

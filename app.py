@@ -133,6 +133,11 @@ with app.app_context():
     if 'max_per_user' not in cols:
         db.session.execute(db.text('ALTER TABLE product ADD COLUMN max_per_user INTEGER DEFAULT 0'))
         db.session.commit()
+    result = db.session.execute(db.text('PRAGMA table_info(ticket)'))
+    cols = [row[1] for row in result.fetchall()]
+    if 'service_id' not in cols:
+        db.session.execute(db.text('ALTER TABLE ticket ADD COLUMN service_id INTEGER REFERENCES service(id)'))
+        db.session.commit()
 
 if __name__ == '__main__':
     debug = os.environ.get('FLASK_DEBUG', '0') == '1'

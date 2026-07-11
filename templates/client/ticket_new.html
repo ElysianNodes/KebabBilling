@@ -24,6 +24,15 @@
                 </select>
             </div>
             <div class="mb-3">
+                <label class="form-label">Related Service</label>
+                <select name="service_id" class="form-select">
+                    <option value="">None (general inquiry)</option>
+                    {% for s in services %}
+                    <option value="{{ s.id }}">{{ s.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
                 <label class="form-label">Message</label>
                 <textarea name="message" class="form-control" rows="5" required></textarea>
             </div>

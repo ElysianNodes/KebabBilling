@@ -10,11 +10,13 @@
 <div class="card">
     <div class="card-body">
         <table class="table">
-            <thead><tr><th>Client</th><th>Subject</th><th>Priority</th><th>Status</th><th>Created</th><th></th></tr></thead>
+            <thead><tr><th>Client</th><th>Email</th><th>Service</th><th>Subject</th><th>Priority</th><th>Status</th><th>Created</th><th></th></tr></thead>
             <tbody>
             {% for t in tickets %}
             <tr>
                 <td>{{ t.client.username }}</td>
+                <td>{{ t.client.email }}</td>
+                <td>{% if t.service %}{{ t.service.name }}{% else %}<span class="text-muted">None</span>{% endif %}</td>
                 <td><a href="{{ url_for('admin.view_ticket', id=t.id) }}">{{ t.subject }}</a></td>
                 <td><span class="badge bg-{{ 'danger' if t.priority == 'high' else 'warning' if t.priority == 'medium' else 'info' }}">{{ t.priority }}</span></td>
                 <td><span class="badge bg-{{ 'danger' if t.status == 'open' else 'success' if t.status == 'closed' else 'secondary' }}">{{ t.status }}</span></td>
@@ -30,7 +32,7 @@
                 </td>
             </tr>
             {% else %}
-            <tr><td colspan="6" class="text-muted">No tickets</td></tr>
+            <tr><td colspan="8" class="text-muted">No tickets</td></tr>
             {% endfor %}
             </tbody>
         </table>
