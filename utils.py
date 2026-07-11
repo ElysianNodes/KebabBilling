@@ -108,13 +108,21 @@ def pterodactyl_create_user(email, username):
     return None, None
 
 def pterodactyl_get_node_allocation(node_id):
-    result = _api_request(f'/nodes/{node_id}/allocations?per_page=100', method='GET')
-    if not result or 'data' not in result:
-        return None
-    for alloc in result['data']:
-        attrs = alloc.get('attributes', {})
-        if not attrs.get('assigned'):
-            return attrs['id']
+    page = 1
+    while True:
+        result = _api_request(f'/nodes/{node_id}/allocations?per_page=100&page={page}', method='GET')
+        if not result or 'data' not in result:
+            return None
+        for alloc in result['data']:
+            attrs = alloc.get('attributes', {})
+            if not attrs.get('assigned'):
+                return attrs['id']
+        meta = result.get('meta', {}) or {}
+        pagination = meta.get('pagination', {}) or {}
+        total_pages = pagination.get('total_pages') or pagination.get('last_page', 0)
+        if page >= total_pages:
+            break
+        page += 1
     return None
 
 def pterodactyl_get_egg(nest_id, egg_id):
