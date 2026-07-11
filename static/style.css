@@ -19,6 +19,7 @@
     --input-bg: #fff;
     --input-border: #e2e8f0;
     --input-color: #2d3748;
+    --input-placeholder: #a0aec0;
     --auth-bg: #f0f2f5;
     --auth-card-bg: #fff;
     --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
@@ -43,11 +44,46 @@
     --input-bg: #16162a;
     --input-border: #2d2d4a;
     --input-color: #c8c9d6;
+    --input-placeholder: #6b6d82;
     --auth-bg: #0d0d1a;
     --auth-card-bg: #1a1a2e;
     --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
     --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
     --shadow-lg: 0 10px 40px rgba(0,0,0,0.5);
+}
+
+[data-theme="dark"] .bg-light { background: #16162a !important; }
+
+[data-theme="dark"] .text-dark { color: #c8c9d6 !important; }
+
+[data-theme="dark"] .table { --bs-table-bg: transparent; --bs-table-color: var(--text-primary); }
+
+[data-theme="dark"] .alert-info {
+    background: rgba(105,86,235,0.15);
+    color: #b8b9e8;
+    border: 1px solid rgba(105,86,235,0.2);
+}
+
+[data-theme="dark"] .alert-warning {
+    background: rgba(255,193,7,0.12);
+    color: #e8d88b;
+    border: 1px solid rgba(255,193,7,0.15);
+}
+
+[data-theme="dark"] .alert-success {
+    background: rgba(72,187,120,0.12);
+    color: #8bd8a8;
+    border: 1px solid rgba(72,187,120,0.15);
+}
+
+[data-theme="dark"] .alert-danger {
+    background: rgba(229,62,62,0.12);
+    color: #e8a0a0;
+    border: 1px solid rgba(229,62,62,0.15);
+}
+
+[data-theme="dark"] .btn-close {
+    filter: invert(1) brightness(0.8);
 }
 
 * { box-sizing: border-box; }
@@ -400,6 +436,11 @@ body {
 .form-control:focus, .form-select:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.form-control::placeholder, .form-select::placeholder {
+    color: var(--input-placeholder);
+    opacity: 1;
 }
 
 .form-label {
